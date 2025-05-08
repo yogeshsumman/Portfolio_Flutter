@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../models/contact.dart';
 import '../widgets/profile_section.dart';
 import '../widgets/contact_section.dart';
 import '../widgets/custom_bottom_nav.dart';
-import 'projects_screen.dart';
+import 'contact_screen.dart';
 import 'skills_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -16,15 +17,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   bool _isVisible = false;
   bool _isDarkMode = true;
   int _currentIndex = 0;
+  Contact? _currentContact;
 
-  late List<Widget> _screens;
+  late List<Widget> _otherScreens;
 
   @override
   void initState() {
     super.initState();
-    _screens = [
-      _buildMainContent(),
-      const ContactsScreen(),
+    _otherScreens = [
+      ContactsScreen(onContactSelected: _selectContact),
       SkillsScreen(isDarkMode: _isDarkMode),
       const Center(child: Text('More', style: TextStyle(fontSize: 24))),
     ];
@@ -36,15 +37,24 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     });
   }
 
+  void _selectContact(Contact contact) {
+    print('Selecting contact: ${contact.name}, ${contact.phone}, ${contact.designation}, ${contact.imageUrl}, ${contact.email}');
+    setState(() {
+      _currentContact = contact;
+      _currentIndex = 0; // Switch to Profile tab
+    });
+  }
+
   Widget _buildMainContent() {
+    print('Building main content with contact: ${_currentContact?.name ?? 'null'}');
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: _isDarkMode
-              ? [Color(0xFF1E1E2E), Color(0xFF2A2A3E)]
-              : [Color(0xFFD6D6FF), Color(0xFFB3E5FC)],
+              ? [const Color(0xFF1E1E2E), const Color(0xFF2A2A3E)]
+              : [const Color(0xFFD6D6FF), const Color(0xFFB3E5FC)],
         ),
       ),
       child: Center(
@@ -55,11 +65,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             duration: const Duration(milliseconds: 800),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                ProfileSection(),
-                SizedBox(height: 32),
-                ContactSection(),
-                SizedBox(height: 40),
+              children: [
+                ProfileSection(contact: _currentContact),
+                const SizedBox(height: 32),
+                ContactSection(
+                  contact: _currentContact,
+                  onContactSelected: _selectContact,
+                ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -71,8 +84,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   void _toggleTheme() {
     setState(() {
       _isDarkMode = !_isDarkMode;
-      _screens[0] = _buildMainContent();
-      _screens[2] = SkillsScreen(isDarkMode: _isDarkMode);
+      _otherScreens[1] = SkillsScreen(isDarkMode: _isDarkMode);
+    });
+  }
+
+  void _onNavTap(int index) {
+    setState(() {
+      _currentIndex = index;
+      if (index == 0) {
+        _currentContact = null; // Reset to default profile
+        print('Resetting to default profile');
+      }
     });
   }
 
@@ -115,10 +137,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             ),
           ],
         ),
-        body: _screens[_currentIndex],
+        body: _currentIndex == 0 ? _buildMainContent() : _otherScreens[_currentIndex - 1],
         bottomNavigationBar: CustomBottomNav(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: _onNavTap,
           isDarkMode: _isDarkMode,
         ),
       ),

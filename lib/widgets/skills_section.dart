@@ -14,10 +14,10 @@ class SkillsSection extends StatelessWidget {
       {'name': 'REST APIs', 'icon': Icons.api},
       {'name': 'Git', 'icon': Icons.account_tree},
       {'name': 'UI/UX Design', 'icon': Icons.design_services},
-      {'name': 'React', 'icon': Icons.web}, // Added React
-      {'name': 'Node.js', 'icon': Icons.memory}, // Added Node.js
-      {'name': 'TypeScript', 'icon': Icons.code_off}, // Added TypeScript
-      {'name': 'SQL & MongoDB', 'icon': Icons.storage}, // Added Databases
+      {'name': 'React', 'icon': Icons.web},
+      {'name': 'Node.js', 'icon': Icons.memory},
+      {'name': 'TypeScript', 'icon': Icons.code_off},
+      {'name': 'SQL & MongoDB', 'icon': Icons.storage},
     ];
 
     return Padding(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/portfolio_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const MyPortfolioApp());
@@ -10,6 +10,14 @@ class MyPortfolioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PortfolioScreen();
+    return MaterialApp(
+      title: 'My Portfolio',
+      debugShowCheckedModeBanner: false, // Disable the debug banner
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: const SplashScreen(),
+    );
   }
 }

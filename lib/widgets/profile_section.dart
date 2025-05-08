@@ -1,87 +1,101 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../models/contact.dart';
 
-class ProfileSection extends StatefulWidget {
-  const ProfileSection({super.key});
+class ProfileSection extends StatelessWidget {
+  final Contact? contact;
 
-  @override
-  _ProfileSectionState createState() => _ProfileSectionState();
-}
-
-class _ProfileSectionState extends State<ProfileSection> {
-  final List<Color> _colors = [
-    Colors.black.withOpacity(0.7),
-    Colors.blue.withOpacity(0.7),
-    Colors.green.withOpacity(0.7),
-    Colors.red.withOpacity(0.7),
-    Colors.purple.withOpacity(0.7),
-  ];
-  late Color _currentColor;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentColor = _colors[0];
-  }
-
-  void _changeColor() {
-    setState(() {
-      Color newColor;
-      do {
-        newColor = _colors[Random().nextInt(_colors.length)];
-      } while (newColor == _currentColor);
-      _currentColor = newColor;
-    });
-  }
-
-  bool _isDarkBackground(Color color) {
-    final luminance = (0.299 * color.red + 0.587 * color.green + 0.114 * color.blue) / 255;
-    return luminance < 0.5;
-  }
+  const ProfileSection({super.key, this.contact});
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final textColor = _isDarkBackground(_currentColor) ? Colors.white : Colors.black;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final displayContact = contact ?? Contact(
+      name: 'Yogesh Summan',
+      phone: '+91 123456789',
+      designation: 'Software Developer',
+      imageUrl: 'assets/profile.jpg',
+      aboutMe: 'Enthusiastic developer eager to learn and build impactful apps.',
+      email: 'yogesh.summan@example.com',
+    );
 
-    return GestureDetector(
-      onTap: _changeColor,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16.0),
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: _currentColor,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const CircleAvatar(
-                radius: 70,
-                backgroundImage: AssetImage('assets/profile.jpg'),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Yogesh Summan',
-                style: textTheme.headlineLarge?.copyWith(color: textColor),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Software Engineer',
-                style: textTheme.headlineMedium?.copyWith(color: textColor.withOpacity(0.7)),
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  'I am a passionate software engineer who loves building amazing apps and solving real-world problems with code.',
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodyMedium?.copyWith(color: textColor),
-                ),
-              ),
-            ],
-          ),
+    Widget profileImage;
+    if (displayContact.imageUrl.startsWith('assets/')) {
+      profileImage = CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.transparent,
+        backgroundImage: AssetImage(displayContact.imageUrl),
+        child: null,
+      );
+    } else {
+      profileImage = CachedNetworkImage(
+        imageUrl: displayContact.imageUrl,
+        imageBuilder: (context, imageProvider) => CircleAvatar(
+          radius: 50,
+          backgroundColor: Colors.transparent,
+          backgroundImage: imageProvider,
         ),
+        placeholder: (context, url) => CircleAvatar(
+          radius: 50,
+          backgroundColor: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+          child: Icon(Icons.person, size: 60, color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+        ),
+        errorWidget: (context, url, error) => CircleAvatar(
+          radius: 50,
+          backgroundColor: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+          child: const Icon(Icons.error, size: 60, color: Colors.red),
+        ),
+      );
+    }
+
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? Colors.grey[900]!.withOpacity(0.9)
+            : Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          profileImage,
+          const SizedBox(height: 15),
+          Text(
+            displayContact.name,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            displayContact.designation,
+            style: TextStyle(
+              fontSize: 18,
+              fontStyle: FontStyle.italic,
+              color: isDarkMode ? Colors.white70 : Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'About Me: ${displayContact.aboutMe}',
+            style: TextStyle(
+              fontSize: 16,
+              color: isDarkMode ? Colors.white70 : Colors.black54,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
