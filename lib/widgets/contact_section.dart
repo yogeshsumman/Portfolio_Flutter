@@ -39,7 +39,7 @@ class ContactSection extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(Icons.phone, color: textColor.withOpacity(0.7), size: 20),
                 const SizedBox(width: 8),
@@ -54,7 +54,7 @@ class ContactSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(Icons.email, color: textColor.withOpacity(0.7), size: 20),
                 const SizedBox(width: 8),
